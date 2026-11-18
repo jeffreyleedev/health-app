@@ -1,13 +1,14 @@
 /**
  * Settings: edit your stats and units (same form and rules as setup),
- * and sign out. Changing units only changes the display — entries are
- * stored in metric and never converted.
+ * sign out, and delete the account. Changing units only changes the display —
+ * entries are stored in metric and never converted.
  */
 
 import { Suspense } from "react";
 import { signOut } from "@/app/auth/actions";
 import { updateProfile } from "@/app/profile/actions";
 import { AppPage } from "@/components/app-nav";
+import { DeleteAccountForm } from "@/components/delete-account-form";
 import { ProfileForm } from "@/components/profile-form";
 import { todayUtc, yearsBefore } from "@/lib/dates";
 import { MIN_AGE_YEARS } from "@/lib/profile-validation";
@@ -44,6 +45,7 @@ async function SettingsContent() {
           Sign out
         </button>
       </form>
+      <DeleteAccountForm />
     </>
   );
 }

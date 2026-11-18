@@ -8,7 +8,9 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ACCOUNT_DELETED_PARAM, DELETE_ACCOUNT_ERRORS, parseDeleteAccountForm } from "@/lib/account-deletion";
 import { authConfirmUrl, formText, validateEmail, validateNewPassword } from "@/lib/auth-validation";
+import { deleteMyAccount } from "@/lib/data/account";
 import { createSupabaseServerClient, getVerifiedUser } from "@/lib/supabase/server";
 import type { FormState } from "./form-state";
 
@@ -69,6 +71,27 @@ export async function signOut(): Promise<void> {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/sign-in");
+}
+
+/**
+ * Permanently deletes the signed-in user's account after re-checking their
+ * password. Order: check password → delete → clear this browser's cookies →
+ * sign-in page. If anything fails before the delete, nothing is deleted.
+ */
+export async function deleteAccount(_prev: FormState, formData: FormData): Promise<FormState> {
+  const parsed = parseDeleteAccountForm(formData);
+  if (!parsed.ok) return { error: parsed.error };
+
+  const result = await deleteMyAccount(parsed.password);
+  if (result === "signed-out") redirect("/sign-in");
+  if (result !== "deleted") return { error: DELETE_ACCOUNT_ERRORS[result] };
+
+  // The account is gone, but the signed access token in the cookie would stay
+  // valid for up to an hour. "local" removes the cookies before it contacts
+  // Supabase, so this works even though the user no longer exists.
+  const supabase = await createSupabaseServerClient();
+  await supabase.auth.signOut({ scope: "local" });
+  redirect(`/sign-in?${ACCOUNT_DELETED_PARAM}=1`);
 }
 
 export async function requestPasswordReset(_prev: FormState, formData: FormData): Promise<FormState> {
