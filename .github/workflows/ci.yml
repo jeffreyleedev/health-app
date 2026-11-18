@@ -1,6 +1,7 @@
-# Runs the project's five checks (Formatting, Lint, Typecheck, Tests,
-# Build) on pull requests. `npm run check` runs the same commands locally,
-# one after another.
+# Runs the project's four checks (Formatting, Lint, Tests, Build) on
+# pull requests. `npm run check` runs the same commands locally, one after
+# another. There's no separate typecheck: `next build` type-checks every
+# file in tsconfig, including tests and scripts.
 #
 # Pull requests only: each run tests the result of merging the PR into its
 # base branch (the latest main), which is what the main ruleset requires to
@@ -28,7 +29,7 @@ concurrency:
 jobs:
   # One job per check, all running at the same time on separate machines.
   # Each shows up on pull requests as its own check, and the ruleset on
-  # main requires all five by these names, so keep them in sync if renamed.
+  # main requires all four by these names, so keep them in sync if renamed.
   check:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -43,8 +44,6 @@ jobs:
             command: npm run format:check
           - name: Lint
             command: npm run lint
-          - name: Typecheck
-            command: npm run typecheck
           - name: Tests
             command: npm test
           - name: Build
