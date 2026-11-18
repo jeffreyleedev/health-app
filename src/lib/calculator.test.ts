@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculate, chosenWeight, weightBoxText, weightLossTargets } from "./calculator";
+import { calculate, calculateBmi, chosenWeight, weightBoxText, weightLossTargets } from "./calculator";
 
 describe("calculate", () => {
   it("matches hand-worked Mifflin-St Jeor numbers", () => {
@@ -33,6 +33,14 @@ describe("calculate", () => {
     });
     expect(r.ageYears).toBe(29);
     expect(r.bmr).toBe(1325);
+  });
+});
+
+describe("calculateBmi", () => {
+  it("rounds to 1 decimal and picks the category from the shown value", () => {
+    expect(calculateBmi(80, 180)).toEqual({ bmi: 24.7, bmiCategory: "healthy" }); // 24.69
+    expect(calculateBmi(81, 180)).toEqual({ bmi: 25, bmiCategory: "overweight" }); // 25.0
+    expect(calculateBmi(50, 170)).toEqual({ bmi: 17.3, bmiCategory: "underweight" });
   });
 });
 

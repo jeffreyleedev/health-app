@@ -1,5 +1,5 @@
 /**
- * Layout for signed-in pages: a Weigh-ins | Calories | Calculators | History | Settings
+ * Layout for signed-in pages: a Weigh-ins | Calories | BMI | History | Settings
  * nav above the page title. It wraps onto a second line on narrow screens.
  * Plain links, no session reads, so it renders instantly.
  */
@@ -9,7 +9,7 @@ import Link from "next/link";
 const LINKS = [
   { href: "/weigh-ins", label: "Weigh-ins", key: "weighIns" },
   { href: "/calories", label: "Calories", key: "calories" },
-  { href: "/calculators", label: "Calculators", key: "calculators" },
+  { href: "/bmi", label: "BMI", key: "bmi" },
   { href: "/history", label: "History", key: "history" },
   { href: "/settings", label: "Settings", key: "settings" },
 ] as const;

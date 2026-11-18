@@ -48,6 +48,19 @@ describe("profile check on every protected page", () => {
     expect(await config.redirects?.()).toContainEqual({ source: "/", destination: HOME_PATH, permanent: false });
   });
 
+  it("old /calculators links redirect to Calories, and no Calculators page is left", async () => {
+    const routes = pages.map((p) => p.route);
+    expect(routes).toContain("calories");
+    expect(routes).toContain("bmi");
+    expect(routes).not.toContain("calculators");
+    const { default: config } = await import("../../next.config");
+    expect(await config.redirects?.()).toContainEqual({
+      source: "/calculators",
+      destination: "/calories",
+      permanent: false,
+    });
+  });
+
   it("every non-exempt page calls requireProfile()", () => {
     const missing = pages
       .filter((p) => !EXEMPT.has(p.route))
