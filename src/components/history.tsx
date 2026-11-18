@@ -55,6 +55,9 @@ export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Prop
   const hasData = rows.some((r) => r.weighInCount > 0 || r.loggedCalorieDays > 0);
   const hasWeighIns = rows.some((r) => r.weighInCount > 0);
   const weightUnit = unitSystem === "metric" ? "kg" : "lb";
+  // The table hides periods with no entries at all; the current period always shows.
+  // Charts still get every period so their time axis stays even.
+  const tableRows = rows.filter((r) => r.current || r.weighInCount > 0 || r.loggedCalorieDays > 0).reverse();
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,7 +122,7 @@ export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Prop
                 </tr>
               </thead>
               <tbody>
-                {[...rows].reverse().map((r) => (
+                {tableRows.map((r) => (
                   <tr key={r.start} className="border-b border-line align-top">
                     <td className="py-2 pr-2">
                       {r.label}
