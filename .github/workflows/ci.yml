@@ -1,10 +1,11 @@
 # Runs the project's five checks (Formatting, Lint, Typecheck, Tests,
-# Build) on every push (any branch) and on pull requests. `npm run check`
-# runs the same commands locally, one after another.
+# Build) on pull requests. `npm run check` runs the same commands locally,
+# one after another.
 #
-# A pull_request run tests the result of merging the PR into its base
-# branch, which can differ from the branch alone if the base has moved on.
-# A push to a branch with an open PR therefore runs the checks twice.
+# Pull requests only: each run tests the result of merging the PR into its
+# base branch (the latest main), which is what the main ruleset requires to
+# pass before merging. Pushing a branch without a PR runs nothing, so run
+# `npm run check` locally before pushing.
 #
 # No Supabase keys here on purpose: the secret key bypasses Row Level
 # Security, so it stays only in .env.local and Supabase. The live database
@@ -13,16 +14,13 @@
 name: CI
 
 on:
-  push:
   pull_request:
 
 # Read-only access to the repository is all the checks need.
 permissions:
   contents: read
 
-# A newer push cancels the older, now-outdated run for the same branch (or
-# the same pull request). Push runs and pull-request runs use different
-# refs, so one never cancels the other.
+# A newer push to a pull request's branch cancels its older, now-outdated run.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
