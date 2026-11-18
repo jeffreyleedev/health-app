@@ -13,7 +13,9 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "npm run format:check && npm run lint && npm run test:unit && npm run test:guard && npm run build",
+    "test:unit": "vitest run --exclude \"**/*.guard.test.ts\"",
+    "test:guard": "vitest run guard.test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

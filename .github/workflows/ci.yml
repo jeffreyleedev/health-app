@@ -1,5 +1,16 @@
-# Runs the project's checks on every push, to any branch.
-# Same steps as `npm run check` locally.
+# Runs the project's five checks (Prettier, ESLint, Unit Tests, Guard
+# Tests, Build) on pull requests. `npm run check` runs the same commands
+# locally, one after another. There's no separate typecheck: `next build`
+# type-checks every file in tsconfig, including tests and scripts.
+#
+# Guard tests are files named *.guard.test.ts (project rules: profile check
+# on every page, theme colors, schema permissions); everything else is a
+# unit test.
+#
+# Pull requests only: each run tests the result of merging the PR into its
+# base branch (the latest main), which is what the main ruleset requires to
+# pass before merging. Pushing a branch without a PR runs nothing, so run
+# `npm run check` locally before pushing.
 #
 # No Supabase keys here on purpose: the secret key bypasses Row Level
 # Security, so it stays only in .env.local and Supabase. The live database
@@ -8,21 +19,41 @@
 name: CI
 
 on:
-  push:
+  pull_request:
 
 # Read-only access to the repository is all the checks need.
 permissions:
   contents: read
 
-# A newer push to the same branch cancels the older, now-outdated run.
+# A newer push to a pull request's branch cancels its older, now-outdated run.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # One job per check, all running at the same time on separate machines.
+  # Each shows up on pull requests as its own check, and the ruleset on
+  # main requires all five by these names, so keep them in sync if renamed.
   check:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      # Let every check finish even if one fails, so each shows its real
+      # result instead of "cancelled".
+      fail-fast: false
+      matrix:
+        include:
+          - name: Prettier
+            command: npm run format:check
+          - name: ESLint
+            command: npm run lint
+          - name: Unit Tests
+            command: npm run test:unit
+          - name: Guard Tests
+            command: npm run test:guard
+          - name: Build
+            command: npm run build
     steps:
       - uses: actions/checkout@v7
 
@@ -34,18 +65,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Fastest first, so a simple mistake fails the run quickly.
-      - name: Formatting
-        run: npm run format:check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Tests
-        run: npm test
-
-      - name: Production build
-        run: npm run build
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}
