@@ -1,90 +1,37 @@
 "use client";
 
 /**
- * BMR, TDEE, and BMI calculators. Runs entirely in the browser: results
- * update as you type and are never saved. The weight starts at your latest
- * weigh-in; changing it previews a what-if weight.
+ * BMR, TDEE, and weight-loss targets (bottom of the Calories page). Runs
+ * entirely in the browser: results update as you type and are never saved.
  */
 
-import Link from "next/link";
-import { useState } from "react";
-import {
-  calculate,
-  chosenWeight,
-  MIN_SAFE_CALORIES,
-  weightBoxText,
-  weightLossTargets,
-  type CalculatorStats,
-} from "@/lib/calculator";
-import { formatDate, type DateString } from "@/lib/dates";
-import { ACTIVITY_LEVELS, BMI_CATEGORY_COLOR, BMI_CATEGORY_LABELS, type ActivityLevel } from "@/lib/formulas";
+import { calculate, MIN_SAFE_CALORIES, weightLossTargets, type CalculatorStats } from "@/lib/calculator";
+import { ACTIVITY_LEVELS, type ActivityLevel } from "@/lib/formulas";
 import type { UnitSystem } from "@/lib/units";
 import { useLocalToday } from "./use-local-today";
+import { useWeightBox, type LatestWeighIn } from "./weight-box";
 
 interface Props {
   stats: CalculatorStats;
   activityLevel: ActivityLevel;
   unitSystem: UnitSystem;
-  latest: { date: DateString; weightKg: number } | null;
+  latest: LatestWeighIn;
 }
 
-export function Calculators({ stats, activityLevel, unitSystem, latest }: Props) {
-  const unit = unitSystem === "metric" ? "kg" : "lb";
-  const startText = latest ? weightBoxText(latest.weightKg, unitSystem) : "";
-  const [typed, setTyped] = useState<string | null>(null);
-  const today = useLocalToday(); // "" until the browser fills it in
-  const weight = chosenWeight(typed, latest?.weightKg ?? null, unitSystem);
-  const kg = weight.kind === "latest" || weight.kind === "preview" ? weight.kg : null;
+export function BmrTdee({ stats, activityLevel, unitSystem, latest }: Props) {
+  const { kg, box } = useWeightBox(latest, unitSystem);
+  const today = useLocalToday(); // "" until the browser fills it in (age needs it)
   const result = kg !== null && today ? calculate({ weightKg: kg, stats, today }) : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-2">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Weight ({unit})</span>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="any"
-            min="0"
-            value={typed ?? startText}
-            onChange={(e) => setTyped(e.target.value)}
-            className="rounded border border-line px-3 py-2"
-          />
-        </label>
-
-        {weight.kind === "latest" && latest && (
-          <p className="text-sm text-muted">From your weigh-in on {formatDate(latest.date)}.</p>
-        )}
-        {weight.kind === "preview" && <p className="text-sm font-medium text-warning">Preview — not saved.</p>}
-        {weight.kind === "error" && (
-          <p role="alert" className="text-sm text-danger">
-            {weight.error}
-          </p>
-        )}
-        {!latest && (
-          <p className="text-sm text-muted">
-            Log a weigh-in to use your latest weight.{" "}
-            <Link href="/" className="underline">
-              Go to Log
-            </Link>
-          </p>
-        )}
-        {latest && typed !== null && typed !== startText && (
-          <button
-            type="button"
-            onClick={() => setTyped(null)}
-            className="self-start rounded border border-line px-3 py-1 text-sm"
-          >
-            Use my latest weigh-in
-          </button>
-        )}
-      </section>
+    <section className="flex flex-col gap-6">
+      <h2 className="text-lg font-semibold">BMR and TDEE</h2>
+      {box}
 
       {result && (
         <>
           <section className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">BMR</h2>
+            <h3 className="font-semibold">BMR</h3>
             <p className="text-3xl font-semibold">
               {result.bmr.toLocaleString("en-US")} <span className="text-base font-normal">calories/day</span>
             </p>
@@ -94,7 +41,7 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
           </section>
 
           <section className="flex flex-col gap-2">
-            <h2 className="text-lg font-semibold">TDEE</h2>
+            <h3 className="font-semibold">TDEE</h3>
             <p className="text-3xl font-semibold">
               {result.tdeeByLevel[activityLevel].toLocaleString("en-US")}{" "}
               <span className="text-base font-normal">calories/day</span>
@@ -123,7 +70,7 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
           </section>
 
           <section className="flex flex-col gap-2">
-            <h2 className="text-lg font-semibold">Weight loss</h2>
+            <h3 className="font-semibold">Weight loss</h3>
             <p className="text-sm text-muted">Most you can eat per day to lose weight at each pace.</p>
             <ul className="flex flex-col gap-2">
               {weightLossTargets(result.tdeeByLevel[activityLevel], unitSystem, stats.sex).map((t) => (
@@ -153,21 +100,8 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
               Estimates use about 3,500 calories per pound of fat. Actual loss varies.
             </p>
           </section>
-
-          <section className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">BMI</h2>
-            <p className={`text-3xl font-semibold ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>
-              {result.bmi.toFixed(1)}
-            </p>
-            <p className={`text-sm ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>
-              {BMI_CATEGORY_LABELS[result.bmiCategory]}
-            </p>
-            <p className="text-xs text-muted">
-              Standard adult categories. BMI doesn&apos;t account for muscle or build.
-            </p>
-          </section>
         </>
       )}
-    </div>
+    </section>
   );
 }

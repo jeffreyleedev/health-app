@@ -8,6 +8,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { HOME_PATH } from "@/lib/app-info";
 import { ACCOUNT_DELETED_PARAM, DELETE_ACCOUNT_ERRORS, parseDeleteAccountForm } from "@/lib/account-deletion";
 import { authConfirmUrl, formText, validateEmail, validateNewPassword } from "@/lib/auth-validation";
 import { deleteMyAccount } from "@/lib/data/account";
@@ -39,7 +40,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: await confirmUrl("/") },
+    options: { emailRedirectTo: await confirmUrl(HOME_PATH) },
   });
   if (error) {
     if (error.code === "over_email_send_rate_limit") return { error: RATE_LIMITED };
@@ -64,7 +65,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
     }
     return { error: "Email or password is incorrect." };
   }
-  redirect("/");
+  redirect(HOME_PATH);
 }
 
 export async function signOut(): Promise<void> {
@@ -124,5 +125,5 @@ export async function updatePassword(_prev: FormState, formData: FormData): Prom
     if (error.code === "weak_password") return { error: error.message };
     return { error: "Couldn't update the password. Please try again." };
   }
-  redirect("/");
+  redirect(HOME_PATH);
 }

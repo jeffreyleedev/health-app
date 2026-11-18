@@ -16,7 +16,7 @@ import { requireProfile } from "@/lib/require-profile";
 
 export default function SettingsPage() {
   return (
-    <AppPage title="Settings" current="settings">
+    <AppPage title="Settings">
       {/* Session reads stream in behind Suspense (required with Cache Components). */}
       <Suspense fallback={<p>Loading…</p>}>
         <SettingsContent />

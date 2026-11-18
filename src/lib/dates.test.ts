@@ -6,7 +6,6 @@ import {
   fromDayNumber,
   isValidDate,
   localDateString,
-  startOfBiweek,
   startOfMonth,
   startOfNextMonth,
   startOfWeek,
@@ -52,18 +51,6 @@ describe("week boundaries (Monday–Sunday)", () => {
     expect(startOfWeek("2026-11-16")).toBe("2026-11-16");
     expect(startOfWeek("2026-11-17")).toBe("2026-11-16");
     expect(startOfWeek("2026-11-22")).toBe("2026-11-16");
-  });
-});
-
-describe("bi-weekly blocks from the 2024-01-01 anchor", () => {
-  it("keeps the first 14 days in one block", () => {
-    expect(startOfBiweek("2024-01-01")).toBe("2024-01-01");
-    expect(startOfBiweek("2024-01-14")).toBe("2024-01-01");
-    expect(startOfBiweek("2024-01-15")).toBe("2024-01-15");
-  });
-
-  it("handles dates before the anchor", () => {
-    expect(startOfBiweek("2023-12-31")).toBe("2023-12-18");
   });
 });
 

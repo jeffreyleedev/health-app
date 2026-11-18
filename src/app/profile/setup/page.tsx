@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import { AuthPage } from "@/components/auth-page";
 import { saveProfile } from "@/app/profile/actions";
 import { ProfileForm } from "@/components/profile-form";
+import { HOME_PATH } from "@/lib/app-info";
 import { getMyProfile } from "@/lib/data/profiles";
 import { todayUtc, yearsBefore } from "@/lib/dates";
 import { MIN_AGE_YEARS } from "@/lib/profile-validation";
@@ -27,7 +28,7 @@ export default function ProfileSetupPage() {
 async function SetupGate() {
   const result = await getMyProfile(); // verifies the session (and calls connection())
   if (!result) redirect("/sign-in");
-  if (result.profile) redirect("/");
+  if (result.profile) redirect(HOME_PATH);
   return (
     <ProfileForm
       action={saveProfile}

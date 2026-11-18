@@ -23,7 +23,6 @@ import { useLocalToday } from "./use-local-today";
 const CADENCES: { key: Cadence; label: string }[] = [
   { key: "daily", label: "Daily" },
   { key: "weekly", label: "Weekly" },
-  { key: "biweekly", label: "Bi-weekly" },
   { key: "monthly", label: "Monthly" },
 ];
 
@@ -37,7 +36,7 @@ interface Props {
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Props) {
-  const [cadence, setCadence] = useState<Cadence>("weekly");
+  const [cadence, setCadence] = useState<Cadence>("daily");
   const today = useLocalToday(); // "" until the browser fills it in
 
   const periods = today ? recentHistory(weighIns, calorieEntries, cadence, today, HISTORY_PERIODS) : [];

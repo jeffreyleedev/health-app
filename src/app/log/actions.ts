@@ -54,7 +54,7 @@ export async function logWeighIn(_prev: EntryFormState, formData: FormData): Pro
   const result = await createMyWeighIn(parsed.value);
   if (result !== "saved") return refused(result);
 
-  refresh(); // re-render the home page (e.g. drop the first-weigh-in heading)
+  refresh(); // re-render the page (e.g. drop the first-weigh-in heading)
   const shown = displayWeight(parsed.value.weightKg, unitSystem);
   return { message: `Saved ${shown.value.toFixed(1)} ${shown.unit} for ${formatDate(parsed.value.date)}.` };
 }

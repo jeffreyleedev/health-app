@@ -1,5 +1,6 @@
 /**
- * Calculator logic for the /calculators page. Pure, so the browser runs it
+ * Calculator logic for the BMR/TDEE section (Calories page) and the BMI
+ * page. Pure, so the browser runs it
  * instantly and tests can check whole results. Nothing here is saved.
  */
 
@@ -34,6 +35,12 @@ export interface CalculatorResult {
   bmiCategory: BmiCategory;
 }
 
+/** BMI (1 decimal) and its adult category. Needs no age, so no date either. */
+export function calculateBmi(weightKg: number, heightCm: number): { bmi: number; bmiCategory: BmiCategory } {
+  const value = bmi(weightKg, heightCm);
+  return { bmi: roundTo(value, 1), bmiCategory: bmiCategory(value) };
+}
+
 export function calculate(input: { weightKg: number; stats: CalculatorStats; today: DateString }): CalculatorResult {
   const { weightKg, stats, today } = input;
   const ageYears = ageOn(stats.birthdate, today);
@@ -41,14 +48,12 @@ export function calculate(input: { weightKg: number; stats: CalculatorStats; tod
   const tdeeByLevel = Object.fromEntries(
     (Object.keys(ACTIVITY_LEVELS) as ActivityLevel[]).map((level) => [level, Math.round(tdee(bmrValue, level))]),
   ) as Record<ActivityLevel, number>;
-  const bmiValue = bmi(weightKg, stats.heightCm);
 
   return {
     ageYears,
     bmr: Math.round(bmrValue),
     tdeeByLevel,
-    bmi: roundTo(bmiValue, 1),
-    bmiCategory: bmiCategory(bmiValue),
+    ...calculateBmi(weightKg, stats.heightCm),
   };
 }
 
@@ -58,7 +63,7 @@ export function weightBoxText(kg: number, unitSystem: UnitSystem): string {
 }
 
 /**
- * Which weight the calculators use.
+ * Which weight a calculator uses (each page's weight box is separate).
  *   typed === null, or unchanged from the box's starting text → the stored kg
  *     (not the rounded number shown, which would shift results slightly)
  *   anything else → the typed weight, checked against the logging range

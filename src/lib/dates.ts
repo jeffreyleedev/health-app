@@ -58,19 +58,6 @@ export function startOfWeek(date: DateString): DateString {
   return addDays(date, -dayOfWeekMondayFirst(date));
 }
 
-/**
- * Bi-weekly blocks are back-to-back 14-day periods counted from this fixed
- * Monday, so every device puts a given date in the same block.
- */
-export const BIWEEKLY_ANCHOR: DateString = "2024-01-01";
-
-export function startOfBiweek(date: DateString): DateString {
-  const anchor = toDayNumber(BIWEEKLY_ANCHOR);
-  const offset = toDayNumber(date) - anchor;
-  // Math.floor (not truncation) keeps dates before the anchor in the right block.
-  return fromDayNumber(anchor + Math.floor(offset / 14) * 14);
-}
-
 export function startOfMonth(date: DateString): DateString {
   return `${date.slice(0, 7)}-01`;
 }

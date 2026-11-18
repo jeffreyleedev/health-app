@@ -6,6 +6,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
+import { HOME_PATH } from "./app-info";
 
 const APP_DIR = join(__dirname, "../app");
 
@@ -34,8 +35,30 @@ const pages = findPages(APP_DIR).map((file) => ({
 
 describe("profile check on every protected page", () => {
   it("finds the app's pages", () => {
-    expect(pages.map((p) => p.route)).toContain("");
+    expect(pages.map((p) => p.route)).toContain("weigh-ins");
+    expect(pages.map((p) => p.route)).toContain("calories");
     expect(pages.map((p) => p.route)).toContain("profile/setup");
+  });
+
+  it("HOME_PATH is a real page, and '/' has no page (next.config.ts redirects it)", async () => {
+    const routes = pages.map((p) => p.route);
+    expect(routes).toContain(HOME_PATH.slice(1));
+    expect(routes).not.toContain("");
+    const { default: config } = await import("../../next.config");
+    expect(await config.redirects?.()).toContainEqual({ source: "/", destination: HOME_PATH, permanent: false });
+  });
+
+  it("old /calculators links redirect to Calories, and no Calculators page is left", async () => {
+    const routes = pages.map((p) => p.route);
+    expect(routes).toContain("calories");
+    expect(routes).toContain("bmi");
+    expect(routes).not.toContain("calculators");
+    const { default: config } = await import("../../next.config");
+    expect(await config.redirects?.()).toContainEqual({
+      source: "/calculators",
+      destination: "/calories",
+      permanent: false,
+    });
   });
 
   it("every non-exempt page calls requireProfile()", () => {

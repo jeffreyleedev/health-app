@@ -2,6 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { HOME_PATH } from "@/lib/app-info";
 import { createMyProfile, getMyProfile, updateMyProfile } from "@/lib/data/profiles";
 import { todayUtc } from "@/lib/dates";
 import { keepStoredHeight, parseProfileForm, type ProfileFormValues } from "@/lib/profile-validation";
@@ -36,7 +37,7 @@ export async function saveProfile(_prev: ProfileFormState, formData: FormData): 
   // createMyProfile verifies the user itself; this action trusts nothing from the form about who they are.
   const result = await createMyProfile(parsed.value);
   if (result === "signed-out") redirect("/sign-in");
-  redirect("/"); // "created", or "exists" (already set up — nothing to overwrite)
+  redirect(HOME_PATH); // "created", or "exists" (already set up — nothing to overwrite)
 }
 
 /**

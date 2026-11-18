@@ -12,6 +12,7 @@
 
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { HOME_PATH } from "@/lib/app-info";
 import { isPublicPath, isSignedOutOnlyPath } from "@/lib/auth-validation";
 import { supabasePublicEnv } from "@/lib/supabase/env";
 
@@ -44,7 +45,7 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   if (!signedIn && !isPublicPath(path)) return redirectKeepingCookies(request, response, "/sign-in");
-  if (signedIn && isSignedOutOnlyPath(path)) return redirectKeepingCookies(request, response, "/");
+  if (signedIn && isSignedOutOnlyPath(path)) return redirectKeepingCookies(request, response, HOME_PATH);
   return response;
 }
 
