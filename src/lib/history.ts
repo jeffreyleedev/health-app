@@ -15,14 +15,13 @@ import {
   formatDate,
   MONTH_NAMES,
   parseDate,
-  startOfBiweek,
   startOfMonth,
   startOfNextMonth,
   startOfWeek,
   type DateString,
 } from "./dates";
 
-export type Cadence = "daily" | "weekly" | "biweekly" | "monthly";
+export type Cadence = "daily" | "weekly" | "monthly";
 
 export interface WeighIn {
   date: DateString;
@@ -53,8 +52,6 @@ export function periodStart(date: DateString, cadence: Cadence): DateString {
       return date;
     case "weekly":
       return startOfWeek(date);
-    case "biweekly":
-      return startOfBiweek(date);
     case "monthly":
       return startOfMonth(date);
   }
@@ -67,8 +64,6 @@ function nextPeriodStart(start: DateString, cadence: Cadence): DateString {
       return addDays(start, 1);
     case "weekly":
       return addDays(start, 7);
-    case "biweekly":
-      return addDays(start, 14);
     case "monthly":
       return startOfNextMonth(start);
   }
@@ -81,8 +76,6 @@ function previousPeriodStart(start: DateString, cadence: Cadence): DateString {
       return addDays(start, -1);
     case "weekly":
       return addDays(start, -7);
-    case "biweekly":
-      return addDays(start, -14);
     case "monthly":
       return startOfMonth(addDays(start, -1)); // the 1st of the previous calendar month
   }
@@ -144,9 +137,7 @@ export const HISTORY_PERIODS = 12;
  */
 export function historyFetchStart(todayUtc: DateString, count = HISTORY_PERIODS): DateString {
   const earliestLocalToday = addDays(todayUtc, -1);
-  const starts = (["daily", "weekly", "biweekly", "monthly"] as const).map((c) =>
-    windowStart(earliestLocalToday, c, count),
-  );
+  const starts = (["daily", "weekly", "monthly"] as const).map((c) => windowStart(earliestLocalToday, c, count));
   return starts.sort(compareDates)[0];
 }
 

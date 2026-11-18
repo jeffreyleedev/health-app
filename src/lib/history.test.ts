@@ -72,15 +72,6 @@ describe("groupHistory — other cadences", () => {
     expect(days).toHaveLength(16); // 2026-11-16 through 2026-12-01
   });
 
-  it("bi-weekly: 14-day blocks from the fixed anchor", () => {
-    const blocks = groupHistory(weighIns, calories, "biweekly");
-    // 2026-11-16 is 1050 days (75 blocks) after 2024-01-01, so it starts a block.
-    expect(blocks.map((b) => [b.start, b.end])).toEqual([
-      ["2026-11-16", "2026-11-29"],
-      ["2026-11-30", "2026-12-13"],
-    ]);
-  });
-
   it("monthly: calendar months", () => {
     const months = groupHistory(weighIns, calories, "monthly");
     expect(months.map((m) => [m.start, m.end])).toEqual([
@@ -138,11 +129,6 @@ describe("recentHistory — last 12 periods ending today", () => {
     expect(periods[9].end).toBe("2026-01-31");
     expect(periods[10].end).toBe("2026-02-28");
   });
-
-  it("uses the fixed bi-weekly blocks", () => {
-    // 2026-11-16 is block-aligned: 1050 days (75 blocks) after 2024-01-01.
-    expect(windowStart(TODAY, "biweekly", 12)).toBe("2026-06-15"); // 11 blocks (154 days) before Nov 16
-  });
 });
 
 describe("historyFetchStart", () => {
@@ -151,7 +137,7 @@ describe("historyFetchStart", () => {
     // whose monthly window starts Dec 1 of the previous year.
     expect(historyFetchStart("2026-12-01")).toBe("2025-12-01");
     for (const localToday of ["2026-11-30", "2026-12-01", "2026-12-02"]) {
-      for (const cadence of ["daily", "weekly", "biweekly", "monthly"] as const) {
+      for (const cadence of ["daily", "weekly", "monthly"] as const) {
         expect(windowStart(localToday, cadence, 12) >= "2025-12-01").toBe(true);
       }
     }
@@ -163,7 +149,7 @@ describe("formatPeriod", () => {
     expect(formatPeriod({ start: "2026-11-17", end: "2026-11-17" }, "daily")).toBe("Nov 17, 2026");
     expect(formatPeriod({ start: "2026-11-16", end: "2026-11-22" }, "weekly")).toBe("Nov 16–22, 2026");
     expect(formatPeriod({ start: "2026-11-30", end: "2026-12-06" }, "weekly")).toBe("Nov 30 – Dec 6, 2026");
-    expect(formatPeriod({ start: "2025-12-29", end: "2026-01-11" }, "biweekly")).toBe("Dec 29, 2025 – Jan 11, 2026");
+    expect(formatPeriod({ start: "2025-12-29", end: "2026-01-04" }, "weekly")).toBe("Dec 29, 2025 – Jan 4, 2026");
     expect(formatPeriod({ start: "2026-11-01", end: "2026-11-30" }, "monthly")).toBe("Nov 2026");
   });
 });
