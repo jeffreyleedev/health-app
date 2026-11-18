@@ -8,13 +8,7 @@ export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 72;
 
 /** Pages a signed-out visitor may open. Everything else redirects to /sign-in. */
-export const PUBLIC_PATHS = [
-  "/sign-in",
-  "/sign-up",
-  "/forgot-password",
-  "/auth/confirm",
-  "/auth/error",
-] as const;
+export const PUBLIC_PATHS = ["/sign-in", "/sign-up", "/forgot-password", "/auth/confirm", "/auth/error"] as const;
 
 /** Pages a signed-in user has no reason to see; they're sent home instead. */
 export const SIGNED_OUT_ONLY_PATHS = ["/sign-in", "/sign-up"] as const;
@@ -73,9 +67,7 @@ export type ValidationResult = { ok: true } | { ok: false; error: string };
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateEmail(email: string): ValidationResult {
-  return EMAIL_PATTERN.test(email)
-    ? { ok: true }
-    : { ok: false, error: "Enter a valid email address." };
+  return EMAIL_PATTERN.test(email) ? { ok: true } : { ok: false, error: "Enter a valid email address." };
 }
 
 export function validateNewPassword(password: string): ValidationResult {

@@ -44,9 +44,7 @@ describe("schema matches the code", () => {
 
 describe("row level security", () => {
   const created = [...sql.matchAll(/create table (public\.\w+)/g)].map((m) => m[1]);
-  const secured = new Set(
-    [...sql.matchAll(/alter table (public\.\w+)\s+enable row level security/g)].map((m) => m[1]),
-  );
+  const secured = new Set([...sql.matchAll(/alter table (public\.\w+)\s+enable row level security/g)].map((m) => m[1]));
 
   it("finds the tables", () => {
     expect(created).toEqual(["public.profiles", "public.weigh_ins", "public.calorie_entries"]);

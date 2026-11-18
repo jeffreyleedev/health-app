@@ -8,12 +8,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import {
-  authConfirmUrl,
-  formText,
-  validateEmail,
-  validateNewPassword,
-} from "@/lib/auth-validation";
+import { authConfirmUrl, formText, validateEmail, validateNewPassword } from "@/lib/auth-validation";
 import { createSupabaseServerClient, getVerifiedUser } from "@/lib/supabase/server";
 import type { FormState } from "./form-state";
 

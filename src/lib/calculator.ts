@@ -6,7 +6,16 @@
 import { ageOn } from "./age";
 import type { DateString } from "./dates";
 import { parseWeight } from "./entry-validation";
-import { ACTIVITY_LEVELS, bmi, bmiCategory, bmr, tdee, type ActivityLevel, type BmiCategory, type Sex } from "./formulas";
+import {
+  ACTIVITY_LEVELS,
+  bmi,
+  bmiCategory,
+  bmr,
+  tdee,
+  type ActivityLevel,
+  type BmiCategory,
+  type Sex,
+} from "./formulas";
 import { displayWeight, KG_PER_LB, roundTo, type UnitSystem } from "./units";
 
 export interface CalculatorStats {
@@ -58,7 +67,11 @@ export function chosenWeight(
   typed: string | null,
   latestKg: number | null,
   unitSystem: UnitSystem,
-): { kind: "latest"; kg: number } | { kind: "preview"; kg: number } | { kind: "error"; error: string } | { kind: "empty" } {
+):
+  | { kind: "latest"; kg: number }
+  | { kind: "preview"; kg: number }
+  | { kind: "error"; error: string }
+  | { kind: "empty" } {
   const startText = latestKg === null ? "" : weightBoxText(latestKg, unitSystem);
   if (typed === null || typed === startText) {
     return latestKg === null ? { kind: "empty" } : { kind: "latest", kg: latestKg };

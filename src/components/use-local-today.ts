@@ -9,5 +9,9 @@ const noSubscription = () => () => {};
  * the server (which only knows its own time zone); the browser fills it in.
  */
 export function useLocalToday(): string {
-  return useSyncExternalStore(noSubscription, () => localDateString(), () => "");
+  return useSyncExternalStore(
+    noSubscription,
+    () => localDateString(),
+    () => "",
+  );
 }

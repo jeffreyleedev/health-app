@@ -16,7 +16,11 @@ describe("fetchAllPages", () => {
   it("gets every row past the 1,000-row cap", async () => {
     const t = fakeTable(2500);
     expect(await fetchAllPages(t.fetchPage)).toEqual(t.rows);
-    expect(t.requests).toEqual([[0, 999], [1000, 1999], [2000, 2999]]);
+    expect(t.requests).toEqual([
+      [0, 999],
+      [1000, 1999],
+      [2000, 2999],
+    ]);
   });
 
   it("asks once more when the last page is exactly full", async () => {

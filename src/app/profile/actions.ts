@@ -7,7 +7,16 @@ import { todayUtc } from "@/lib/dates";
 import { keepStoredHeight, parseProfileForm, type ProfileFormValues } from "@/lib/profile-validation";
 import type { ProfileFormState } from "./form-state";
 
-const FIELDS = ["displayName", "unitSystem", "birthdate", "sex", "heightCm", "heightFt", "heightIn", "activityLevel"] as const;
+const FIELDS = [
+  "displayName",
+  "unitSystem",
+  "birthdate",
+  "sex",
+  "heightCm",
+  "heightFt",
+  "heightIn",
+  "activityLevel",
+] as const;
 
 function readValues(formData: FormData): ProfileFormValues {
   const values: ProfileFormValues = {};

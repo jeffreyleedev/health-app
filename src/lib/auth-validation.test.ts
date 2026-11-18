@@ -33,9 +33,7 @@ describe("safeRedirectPath", () => {
 
 describe("authConfirmUrl", () => {
   it("builds the confirm address from the request origin", () => {
-    expect(authConfirmUrl("http://localhost:3000", "/")).toBe(
-      "http://localhost:3000/auth/confirm?next=%2F",
-    );
+    expect(authConfirmUrl("http://localhost:3000", "/")).toBe("http://localhost:3000/auth/confirm?next=%2F");
     expect(authConfirmUrl("https://health.example.com", "/update-password")).toBe(
       "https://health.example.com/auth/confirm?next=%2Fupdate-password",
     );

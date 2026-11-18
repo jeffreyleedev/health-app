@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { heightBoxesFor, keepStoredHeight, parseDisplayName, parseProfileForm, type ProfileFormValues } from "./profile-validation";
+import {
+  heightBoxesFor,
+  keepStoredHeight,
+  parseDisplayName,
+  parseProfileForm,
+  type ProfileFormValues,
+} from "./profile-validation";
 
 const TODAY = "2026-11-17";
 const base: ProfileFormValues = {

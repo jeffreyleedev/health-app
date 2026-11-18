@@ -28,12 +28,14 @@ export interface ProfileInput {
 export type ProfileField = "displayName" | "unitSystem" | "birthdate" | "sex" | "height" | "activityLevel";
 
 export type ProfileParseResult =
-  | { ok: true; value: ProfileInput }
-  | { ok: false; errors: Partial<Record<ProfileField, string>> };
+  { ok: true; value: ProfileInput } | { ok: false; errors: Partial<Record<ProfileField, string>> };
 
 /** Raw form values, as strings (missing fields are undefined). */
 export type ProfileFormValues = Partial<
-  Record<"displayName" | "unitSystem" | "birthdate" | "sex" | "heightCm" | "heightFt" | "heightIn" | "activityLevel", string>
+  Record<
+    "displayName" | "unitSystem" | "birthdate" | "sex" | "heightCm" | "heightFt" | "heightIn" | "activityLevel",
+    string
+  >
 >;
 
 function isActivityLevel(v: string | undefined): v is ActivityLevel {
@@ -51,7 +53,9 @@ function parseNumber(v: string | undefined): number | null {
  * Optional display name. Trimmed; blank means no name. Mirrors the database
  * rule in 0003_display_name.sql: 1–50 characters, no control characters.
  */
-export function parseDisplayName(raw: string | undefined): { ok: true; value: string | null } | { ok: false; error: string } {
+export function parseDisplayName(
+  raw: string | undefined,
+): { ok: true; value: string | null } | { ok: false; error: string } {
   const name = (raw ?? "").trim();
   if (name === "") return { ok: true, value: null };
   if (/\p{Cc}/u.test(name)) return { ok: false, error: "Use letters, spaces, and punctuation only." };
@@ -102,8 +106,7 @@ export function parseProfileForm(values: ProfileFormValues, today: DateString): 
   }
   if (unitSystem === "metric" || unitSystem === "imperial") {
     if (heightCm === null) {
-      errors.height =
-        unitSystem === "metric" ? "Enter your height in cm." : "Enter whole feet and 0–11 inches.";
+      errors.height = unitSystem === "metric" ? "Enter your height in cm." : "Enter whole feet and 0–11 inches.";
     } else if (heightCm < MIN_HEIGHT_CM || heightCm > MAX_HEIGHT_CM) {
       errors.height =
         unitSystem === "metric"

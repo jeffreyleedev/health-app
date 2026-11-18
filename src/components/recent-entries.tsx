@@ -32,7 +32,9 @@ function showWeight(kg: number, unitSystem: UnitSystem) {
 
 function describe(entry: DeletedEntry, unitSystem: UnitSystem) {
   const value =
-    entry.kind === "weighIn" ? showWeight(entry.weightKg, unitSystem) : `${entry.calories.toLocaleString("en-US")} calories`;
+    entry.kind === "weighIn"
+      ? showWeight(entry.weightKg, unitSystem)
+      : `${entry.calories.toLocaleString("en-US")} calories`;
   return `${value} from ${formatDate(entry.date)}`;
 }
 
@@ -108,7 +110,12 @@ export function RecentEntries({ weighIns, calorieEntries, unitSystem, birthdate 
               id={w.id}
               date={w.date}
               birthdate={birthdate}
-              valueField={{ name: "weight", label: `Weight (${unitSystem === "metric" ? "kg" : "lb"})`, value: displayWeight(w.weightKg, unitSystem).value.toFixed(1), step: "any" }}
+              valueField={{
+                name: "weight",
+                label: `Weight (${unitSystem === "metric" ? "kg" : "lb"})`,
+                value: displayWeight(w.weightKg, unitSystem).value.toFixed(1),
+                step: "any",
+              }}
               onDone={() => setEditing(null)}
             />
           ) : (
@@ -249,7 +256,11 @@ function EditRow({ action, id, date, birthdate, valueField, onDone }: EditRowPro
           </span>
         )}
         <div className="flex gap-2">
-          <button type="submit" disabled={pending} className="rounded bg-foreground px-3 py-1 font-medium text-background disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded bg-foreground px-3 py-1 font-medium text-background disabled:opacity-50"
+          >
             {pending ? "Saving…" : "Save"}
           </button>
           <button type="button" onClick={onDone} className={smallButton}>

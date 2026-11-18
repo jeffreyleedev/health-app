@@ -56,24 +56,17 @@ export function weightInputToKg(value: number, system: UnitSystem): number {
 }
 
 /** Converts a height typed in the user's units to cm, ready to store. */
-export function heightInputToCm(
-  input: { cm: number } | { feet: number; inches: number },
-): number {
+export function heightInputToCm(input: { cm: number } | { feet: number; inches: number }): number {
   const cm = "cm" in input ? input.cm : feetInchesToCm(input.feet, input.inches);
   return roundForStorage(cm);
 }
 
 /** Stored kg -> number to display in the user's units, rounded to 0.1. */
 export function displayWeight(kg: number, system: UnitSystem): { value: number; unit: "kg" | "lb" } {
-  return system === "metric"
-    ? { value: roundTo(kg, 1), unit: "kg" }
-    : { value: roundTo(kgToLb(kg), 1), unit: "lb" };
+  return system === "metric" ? { value: roundTo(kg, 1), unit: "kg" } : { value: roundTo(kgToLb(kg), 1), unit: "lb" };
 }
 
 /** Stored cm -> whole cm, or whole feet + inches. */
-export function displayHeight(
-  cm: number,
-  system: UnitSystem,
-): { cm: number } | { feet: number; inches: number } {
+export function displayHeight(cm: number, system: UnitSystem): { cm: number } | { feet: number; inches: number } {
   return system === "metric" ? { cm: Math.round(cm) } : cmToFeetInches(cm);
 }

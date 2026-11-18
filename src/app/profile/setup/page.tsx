@@ -29,6 +29,10 @@ async function SetupGate() {
   if (!result) redirect("/sign-in");
   if (result.profile) redirect("/");
   return (
-    <ProfileForm action={saveProfile} maxBirthdate={yearsBefore(todayUtc(), MIN_AGE_YEARS)} submitLabel="Save and continue" />
+    <ProfileForm
+      action={saveProfile}
+      maxBirthdate={yearsBefore(todayUtc(), MIN_AGE_YEARS)}
+      submitLabel="Save and continue"
+    />
   );
 }

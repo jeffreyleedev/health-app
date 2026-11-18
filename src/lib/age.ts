@@ -17,8 +17,7 @@ export function ageOn(birthdate: DateString, today: DateString): number {
   const now = parseDate(today);
 
   let age = now.year - birth.year;
-  const birthdayNotYetReached =
-    now.month < birth.month || (now.month === birth.month && now.day < birth.day);
+  const birthdayNotYetReached = now.month < birth.month || (now.month === birth.month && now.day < birth.day);
   if (birthdayNotYetReached) age -= 1;
   return age;
 }

@@ -8,7 +8,14 @@
 
 import { useState } from "react";
 import { BMI_CATEGORY_COLOR, BMI_CATEGORY_LABELS, bmi, bmiCategory } from "@/lib/formulas";
-import { formatPeriod, HISTORY_PERIODS, recentHistory, type Cadence, type CalorieEntry, type WeighIn } from "@/lib/history";
+import {
+  formatPeriod,
+  HISTORY_PERIODS,
+  recentHistory,
+  type Cadence,
+  type CalorieEntry,
+  type WeighIn,
+} from "@/lib/history";
 import { displayWeight, roundTo, type UnitSystem } from "@/lib/units";
 import { LineChart } from "./line-chart";
 import { useLocalToday } from "./use-local-today";
@@ -125,7 +132,9 @@ export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Prop
                       )}
                     </td>
                     <td className="py-2 pr-2 text-right tabular-nums">
-                      {r.averageDailyCalories === null ? "—" : Math.round(r.averageDailyCalories).toLocaleString("en-US")}
+                      {r.averageDailyCalories === null
+                        ? "—"
+                        : Math.round(r.averageDailyCalories).toLocaleString("en-US")}
                       {r.loggedCalorieDays > 0 && (
                         <span className="block text-xs text-muted">{plural(r.loggedCalorieDays, "day")}</span>
                       )}

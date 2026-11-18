@@ -20,11 +20,7 @@ export function isValidDate(date: string): boolean {
   const [, y, m, d] = match.map(Number);
   const utc = new Date(Date.UTC(y, m - 1, d));
   // Date.UTC rolls invalid dates over (Feb 30 -> Mar 2), so check the round trip.
-  return (
-    utc.getUTCFullYear() === y &&
-    utc.getUTCMonth() === m - 1 &&
-    utc.getUTCDate() === d
-  );
+  return utc.getUTCFullYear() === y && utc.getUTCMonth() === m - 1 && utc.getUTCDate() === d;
 }
 
 /** Splits a date into numeric parts, throwing on malformed input. */

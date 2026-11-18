@@ -37,7 +37,9 @@ export function LineChart({ name, unit, points, step }: Props) {
   const x = (i: number) => PAD.left + (points.length === 1 ? plotW / 2 : (i * plotW) / (points.length - 1));
   const y = (v: number) => PAD.top + ((hi - v) / (hi - lo)) * plotH;
 
-  const plotted = points.flatMap((p, i) => (p.value === null ? [] : [{ label: p.label, value: p.value, cx: x(i), cy: y(p.value) }]));
+  const plotted = points.flatMap((p, i) =>
+    p.value === null ? [] : [{ label: p.label, value: p.value, cx: x(i), cy: y(p.value) }],
+  );
   const path = plotted.map((p, i) => `${i === 0 ? "M" : "L"}${p.cx.toFixed(1)},${p.cy.toFixed(1)}`).join(" ");
   const show = (v: number) => `${v.toFixed(1)}${unit}`;
   const first = plotted[0];
@@ -52,7 +54,13 @@ export function LineChart({ name, unit, points, step }: Props) {
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={summary} className="w-full">
         {/* Axis lines and labels */}
         <line x1={PAD.left} y1={PAD.top} x2={PAD.left} y2={HEIGHT - PAD.bottom} className="stroke-line" />
-        <line x1={PAD.left} y1={HEIGHT - PAD.bottom} x2={WIDTH - PAD.right} y2={HEIGHT - PAD.bottom} className="stroke-line" />
+        <line
+          x1={PAD.left}
+          y1={HEIGHT - PAD.bottom}
+          x2={WIDTH - PAD.right}
+          y2={HEIGHT - PAD.bottom}
+          className="stroke-line"
+        />
         {[hi, lo].map((v) => (
           <text key={v} x={PAD.left - 6} y={y(v) + 4} textAnchor="end" className="fill-muted text-[10px]">
             {v.toFixed(axisDecimals)}
@@ -60,7 +68,14 @@ export function LineChart({ name, unit, points, step }: Props) {
         ))}
         {/* Slot ticks, so empty periods are visible */}
         {points.map((_, i) => (
-          <line key={i} x1={x(i)} y1={HEIGHT - PAD.bottom} x2={x(i)} y2={HEIGHT - PAD.bottom + 3} className="stroke-line" />
+          <line
+            key={i}
+            x1={x(i)}
+            y1={HEIGHT - PAD.bottom}
+            x2={x(i)}
+            y2={HEIGHT - PAD.bottom + 3}
+            className="stroke-line"
+          />
         ))}
         <path d={path} fill="none" strokeWidth={2} className="stroke-foreground" />
         {plotted.map((p) => (

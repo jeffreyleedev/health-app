@@ -112,7 +112,9 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
                         {ACTIVITY_LEVELS[level].label}
                         {mine && " — yours"}
                       </td>
-                      <td className="py-1 text-right tabular-nums">{result.tdeeByLevel[level].toLocaleString("en-US")}</td>
+                      <td className="py-1 text-right tabular-nums">
+                        {result.tdeeByLevel[level].toLocaleString("en-US")}
+                      </td>
                     </tr>
                   );
                 })}
@@ -154,9 +156,15 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
 
           <section className="flex flex-col gap-1">
             <h2 className="text-lg font-semibold">BMI</h2>
-            <p className={`text-3xl font-semibold ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>{result.bmi.toFixed(1)}</p>
-            <p className={`text-sm ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>{BMI_CATEGORY_LABELS[result.bmiCategory]}</p>
-            <p className="text-xs text-muted">Standard adult categories. BMI doesn&apos;t account for muscle or build.</p>
+            <p className={`text-3xl font-semibold ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>
+              {result.bmi.toFixed(1)}
+            </p>
+            <p className={`text-sm ${BMI_CATEGORY_COLOR[result.bmiCategory]}`}>
+              {BMI_CATEGORY_LABELS[result.bmiCategory]}
+            </p>
+            <p className="text-xs text-muted">
+              Standard adult categories. BMI doesn&apos;t account for muscle or build.
+            </p>
           </section>
         </>
       )}

@@ -97,11 +97,7 @@ function average(values: number[]): number | null {
  * Builds every period from the one containing the earliest entry through
  * the one containing the latest entry, oldest first.
  */
-export function groupHistory(
-  weighIns: WeighIn[],
-  calorieEntries: CalorieEntry[],
-  cadence: Cadence,
-): HistoryPeriod[] {
+export function groupHistory(weighIns: WeighIn[], calorieEntries: CalorieEntry[], cadence: Cadence): HistoryPeriod[] {
   const allDates = [...weighIns.map((w) => w.date), ...calorieEntries.map((c) => c.date)];
   if (allDates.length === 0) return [];
 
@@ -129,7 +125,13 @@ export function recentHistory(
   today: DateString,
   count: number,
 ): HistoryPeriod[] {
-  return buildPeriods(weighIns, calorieEntries, cadence, windowStart(today, cadence, count), periodStart(today, cadence));
+  return buildPeriods(
+    weighIns,
+    calorieEntries,
+    cadence,
+    windowStart(today, cadence, count),
+    periodStart(today, cadence),
+  );
 }
 
 /** How many periods the history screen shows. */
@@ -155,7 +157,8 @@ export function formatPeriod(period: { start: DateString; end: DateString }, cad
   const e = parseDate(period.end);
   if (cadence === "monthly") return `${MONTH_NAMES[s.month - 1]} ${s.year}`;
   if (s.year !== e.year) return `${formatDate(period.start)} – ${formatDate(period.end)}`;
-  if (s.month !== e.month) return `${MONTH_NAMES[s.month - 1]} ${s.day} – ${MONTH_NAMES[e.month - 1]} ${e.day}, ${e.year}`;
+  if (s.month !== e.month)
+    return `${MONTH_NAMES[s.month - 1]} ${s.day} – ${MONTH_NAMES[e.month - 1]} ${e.day}, ${e.year}`;
   return `${MONTH_NAMES[s.month - 1]} ${s.day}–${e.day}, ${s.year}`;
 }
 
@@ -190,11 +193,7 @@ function buildPeriods(
   }
 
   const periods: HistoryPeriod[] = [];
-  for (
-    let start = firstStart;
-    compareDates(start, lastStart) <= 0;
-    start = nextPeriodStart(start, cadence)
-  ) {
+  for (let start = firstStart; compareDates(start, lastStart) <= 0; start = nextPeriodStart(start, cadence)) {
     const next = nextPeriodStart(start, cadence);
     const weights = weightsByPeriod.get(start) ?? [];
     const calorieDays = dailyTotalsByPeriod.get(start) ?? [];

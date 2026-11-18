@@ -47,9 +47,13 @@ describe("parseWeighInForm", () => {
   it("checks the 25–400 kg range after converting", () => {
     expect(parseWeighInForm({ date: "2026-11-17", weight: "25" }, "metric", limits).ok).toBe(true);
     expect(parseWeighInForm({ date: "2026-11-17", weight: "400" }, "metric", limits).ok).toBe(true);
-    expect(errors(parseWeighInForm({ date: "2026-11-17", weight: "24.9" }, "metric", limits)).weight).toMatch(/25 and 400 kg/);
+    expect(errors(parseWeighInForm({ date: "2026-11-17", weight: "24.9" }, "metric", limits)).weight).toMatch(
+      /25 and 400 kg/,
+    );
     // 1800 lb is a typo for 180 — about 816 kg.
-    expect(errors(parseWeighInForm({ date: "2026-11-17", weight: "1800" }, "imperial", limits)).weight).toMatch(/56 and 881 lb/);
+    expect(errors(parseWeighInForm({ date: "2026-11-17", weight: "1800" }, "imperial", limits)).weight).toMatch(
+      /56 and 881 lb/,
+    );
     // The pound limits in the message are themselves accepted.
     expect(parseWeighInForm({ date: "2026-11-17", weight: "56" }, "imperial", limits).ok).toBe(true);
     expect(parseWeighInForm({ date: "2026-11-17", weight: "881" }, "imperial", limits).ok).toBe(true);
@@ -92,7 +96,19 @@ describe("parseEntryId", () => {
   });
 
   it("rejects anything else before it reaches a query", () => {
-    for (const raw of [undefined, "", "0", "-1", "1.5", "abc", "1 or 1=1", " 7", "007", "1e3", "99999999999999999999"]) {
+    for (const raw of [
+      undefined,
+      "",
+      "0",
+      "-1",
+      "1.5",
+      "abc",
+      "1 or 1=1",
+      " 7",
+      "007",
+      "1e3",
+      "99999999999999999999",
+    ]) {
       expect(parseEntryId(raw)).toBeNull();
     }
   });

@@ -34,7 +34,9 @@ function typedCm(h: Heights, units: UnitSystem): number | null {
   }
   const feet = Number(h.heightFt);
   const inches = h.heightIn.trim() ? Number(h.heightIn) : 0;
-  return h.heightFt.trim() && Number.isFinite(feet) && Number.isFinite(inches) ? heightInputToCm({ feet, inches }) : null;
+  return h.heightFt.trim() && Number.isFinite(feet) && Number.isFinite(inches)
+    ? heightInputToCm({ feet, inches })
+    : null;
 }
 
 export interface ProfileFormInitial {
@@ -66,7 +68,9 @@ export function ProfileForm({ action, maxBirthdate, submitLabel, initial }: Prop
   const [birthdate, setBirthdate] = useState(initial?.birthdate ?? "");
   const [sex, setSex] = useState<Sex | "">(initial?.sex ?? "");
   const [activity, setActivity] = useState<ActivityLevel | "">(initial?.activityLevel ?? "");
-  const [heights, setHeights] = useState<Heights>(initial ? boxes(initial.heightCm, initial.unitSystem) : EMPTY_HEIGHTS);
+  const [heights, setHeights] = useState<Heights>(
+    initial ? boxes(initial.heightCm, initial.unitSystem) : EMPTY_HEIGHTS,
+  );
   const err = (f: ProfileField) => state.fieldErrors?.[f];
   const setHeight = (field: keyof Heights, value: string) => setHeights((h) => ({ ...h, [field]: value }));
 
@@ -109,7 +113,14 @@ export function ProfileForm({ action, maxBirthdate, submitLabel, initial }: Prop
         <div className="flex gap-4">
           {(["imperial", "metric"] as const).map((u) => (
             <label key={u} className="flex items-center gap-2">
-              <input type="radio" name="unitSystem" value={u} required checked={units === u} onChange={() => switchUnits(u)} />
+              <input
+                type="radio"
+                name="unitSystem"
+                value={u}
+                required
+                checked={units === u}
+                onChange={() => switchUnits(u)}
+              />
               {u === "imperial" ? "Imperial (lb, ft/in)" : "Metric (kg, cm)"}
             </label>
           ))}
@@ -224,9 +235,7 @@ export function ProfileForm({ action, maxBirthdate, submitLabel, initial }: Prop
 
       {showPrompt ? (
         <div role="alert" className="flex flex-col gap-3 rounded border border-line p-3">
-          <p className="text-sm">
-            Changing your height recalculates BMI for all your history. Save anyway?
-          </p>
+          <p className="text-sm">Changing your height recalculates BMI for all your history. Save anyway?</p>
           <div className="flex gap-2">
             {/* This button's name/value is sent with the form: the server's go-ahead. */}
             <button

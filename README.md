@@ -24,6 +24,7 @@ their own account, and their data follows them between phone and laptop.
 
   Calculators default to your latest weigh-in. You can type a different
   weight to preview results without saving it.
+
 - **History:** your last 12 days, weeks, two-week blocks, or months. Each
   period shows average weight and average calories per logged day, with
   weight and BMI charts.
@@ -88,14 +89,14 @@ Open [http://localhost:3000](http://localhost:3000) and create an account.
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Start the development server |
-| `npm run build` | Production build |
-| `npm start` | Run the production build |
-| `npm test` | Run all tests once |
-| `npm run test:watch` | Re-run tests on every change |
-| `npm run lint` | Lint |
+| Command                  | What it does                                                  |
+| ------------------------ | ------------------------------------------------------------- |
+| `npm run dev`            | Start the development server                                  |
+| `npm run build`          | Production build                                              |
+| `npm start`              | Run the production build                                      |
+| `npm test`               | Run all tests once                                            |
+| `npm run test:watch`     | Re-run tests on every change                                  |
+| `npm run lint`           | Lint                                                          |
 | `npm run check:supabase` | Check database access with your real keys (never prints them) |
 
 ## How it's built

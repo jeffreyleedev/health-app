@@ -48,9 +48,7 @@ export function AuthForm({ action, fields, submitLabel, passwordAutocomplete }: 
             minLength={choosingPassword ? MIN_PASSWORD_LENGTH : undefined}
             className="rounded border border-line px-3 py-2"
           />
-          {choosingPassword && (
-            <span className="text-xs text-muted">At least {MIN_PASSWORD_LENGTH} characters.</span>
-          )}
+          {choosingPassword && <span className="text-xs text-muted">At least {MIN_PASSWORD_LENGTH} characters.</span>}
         </label>
       )}
 

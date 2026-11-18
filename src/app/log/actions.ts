@@ -20,7 +20,13 @@ import {
 } from "@/lib/data/entries";
 import { getMyProfile } from "@/lib/data/profiles";
 import { formatDate, todayUtc } from "@/lib/dates";
-import { entryDateLimits, parseCalorieForm, parseEntryDate, parseEntryId, parseWeighInForm } from "@/lib/entry-validation";
+import {
+  entryDateLimits,
+  parseCalorieForm,
+  parseEntryDate,
+  parseEntryId,
+  parseWeighInForm,
+} from "@/lib/entry-validation";
 import { displayWeight } from "@/lib/units";
 import type { DeletedEntry, EditFormState, EntryFormState } from "./form-state";
 

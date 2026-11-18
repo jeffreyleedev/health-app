@@ -118,7 +118,8 @@ export function parseCalorieForm(
   // Digits only: rejects "", "-5", "1.5", "1e3".
   const calories = /^\d+$/.test(raw) ? Number(raw) : null;
   if (calories === null) errors.calories = "Enter calories as a whole number.";
-  else if (calories > MAX_CALORIES) errors.calories = `Calories must be ${MAX_CALORIES.toLocaleString("en-US")} or less per entry.`;
+  else if (calories > MAX_CALORIES)
+    errors.calories = `Calories must be ${MAX_CALORIES.toLocaleString("en-US")} or less per entry.`;
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
   return { ok: true, value: { date: values.date as DateString, calories: calories as number } };

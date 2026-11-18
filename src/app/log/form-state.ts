@@ -21,5 +21,4 @@ export const initialEditFormState: EditFormState = {};
 
 /** What a delete removed, kept in the browser so Undo can re-save it. */
 export type DeletedEntry =
-  | { kind: "weighIn"; date: string; weightKg: number }
-  | { kind: "calories"; date: string; calories: number };
+  { kind: "weighIn"; date: string; weightKg: number } | { kind: "calories"; date: string; calories: number };

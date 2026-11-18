@@ -28,9 +28,7 @@ describe("tdee", () => {
   });
 
   it("uses the five agreed levels", () => {
-    expect(Object.values(ACTIVITY_LEVELS).map((l) => l.multiplier)).toEqual([
-      1.2, 1.375, 1.55, 1.725, 1.9,
-    ]);
+    expect(Object.values(ACTIVITY_LEVELS).map((l) => l.multiplier)).toEqual([1.2, 1.375, 1.55, 1.725, 1.9]);
   });
 });
 

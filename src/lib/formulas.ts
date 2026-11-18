@@ -27,12 +27,7 @@ function requirePositive(name: string, value: number): void {
  *   10 × weight(kg) + 6.25 × height(cm) − 5 × age(years) + s
  *   where s = +5 for males, −161 for females.
  */
-export function bmr(input: {
-  weightKg: number;
-  heightCm: number;
-  ageYears: number;
-  sex: Sex;
-}): number {
+export function bmr(input: { weightKg: number; heightCm: number; ageYears: number; sex: Sex }): number {
   const { weightKg, heightCm, ageYears, sex } = input;
   requirePositive("weightKg", weightKg);
   requirePositive("heightCm", heightCm);
