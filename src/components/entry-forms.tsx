@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Weigh-in and calorie forms for the home page.
+ * Weigh-in and calorie forms (the Weigh-ins and Calories pages).
  *
  * The date box defaults to the user's *local* today, which only the browser
  * knows. During server rendering the date is left blank (the server would

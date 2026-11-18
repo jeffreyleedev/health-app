@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Recent weigh-ins and calorie entries on the Log page, with inline Edit
- * and Delete. After a delete, an Undo message re-saves the same values as
- * a new entry. The message stays until your next save, edit, or delete.
+ * Recent weigh-ins (Weigh-ins page) and recent calorie entries (Calories
+ * page), with inline Edit and Delete. After a delete, an Undo message
+ * re-saves the same values as a new entry. The message stays until your next
+ * save, edit, or delete on that page, or until you leave the page.
  */
 
 import { useActionState, useState, useTransition } from "react";
@@ -14,13 +15,7 @@ import { displayWeight, type UnitSystem } from "@/lib/units";
 import { useLocalToday } from "./use-local-today";
 
 type Kind = "weighIn" | "calories";
-
-interface Props {
-  weighIns: { id: number; date: string; weightKg: number }[];
-  calorieEntries: { id: number; date: string; calories: number }[];
-  unitSystem: UnitSystem;
-  birthdate: string;
-}
+type ValueField = { name: string; label: string; value: string; step: string };
 
 const inputClass = "rounded border border-line px-2 py-1";
 const smallButton = "rounded border border-line px-2 py-1 text-sm";
@@ -30,31 +25,82 @@ function showWeight(kg: number, unitSystem: UnitSystem) {
   return `${w.value.toFixed(1)} ${w.unit}`;
 }
 
-function describe(entry: DeletedEntry, unitSystem: UnitSystem) {
-  const value =
-    entry.kind === "weighIn"
-      ? showWeight(entry.weightKg, unitSystem)
-      : `${entry.calories.toLocaleString("en-US")} calories`;
-  return `${value} from ${formatDate(entry.date)}`;
+const showCalories = (calories: number) => calories.toLocaleString("en-US");
+
+export function RecentWeighIns(props: {
+  weighIns: { id: number; date: string; weightKg: number }[];
+  unitSystem: UnitSystem;
+  birthdate: string;
+}) {
+  const { unitSystem } = props;
+  return (
+    <RecentList
+      kind="weighIn"
+      title="Recent weigh-ins"
+      empty="No weigh-ins yet."
+      entries={props.weighIns}
+      birthdate={props.birthdate}
+      editAction={editWeighIn}
+      show={(w) => showWeight(w.weightKg, unitSystem)}
+      editField={(w) => ({
+        name: "weight",
+        label: `Weight (${unitSystem === "metric" ? "kg" : "lb"})`,
+        value: displayWeight(w.weightKg, unitSystem).value.toFixed(1),
+        step: "any",
+      })}
+      describeDeleted={(entry) => (entry.kind === "weighIn" ? showWeight(entry.weightKg, unitSystem) : "")}
+    />
+  );
 }
 
-/** Highest id in a list (lists are newest-saved first). */
-const newestId = (list: { id: number }[]) => list[0]?.id ?? 0;
+export function RecentCalories(props: {
+  calorieEntries: { id: number; date: string; calories: number }[];
+  birthdate: string;
+}) {
+  return (
+    <RecentList
+      kind="calories"
+      title="Recent calories"
+      empty="No calorie entries yet."
+      entries={props.calorieEntries}
+      birthdate={props.birthdate}
+      editAction={editCalorieEntry}
+      show={(c) => `${showCalories(c.calories)} cal`}
+      editField={(c) => ({ name: "calories", label: "Calories", value: String(c.calories), step: "1" })}
+      describeDeleted={(entry) => (entry.kind === "calories" ? `${showCalories(entry.calories)} calories` : "")}
+    />
+  );
+}
 
-export function RecentEntries({ weighIns, calorieEntries, unitSystem, birthdate }: Props) {
-  const [editing, setEditing] = useState<{ kind: Kind; id: number } | null>(null);
-  const [undo, setUndo] = useState<{ entry: DeletedEntry; newestAtDelete: number[] } | null>(null);
+interface RecentListProps<T extends { id: number; date: string }> {
+  kind: Kind;
+  title: string;
+  empty: string;
+  /** Newest saved first. */
+  entries: T[];
+  birthdate: string;
+  editAction: (prev: EditFormState, formData: FormData) => Promise<EditFormState>;
+  show: (entry: T) => string;
+  editField: (entry: T) => ValueField;
+  /** The value part of "Deleted … from <date>." */
+  describeDeleted: (entry: DeletedEntry) => string;
+}
+
+function RecentList<T extends { id: number; date: string }>(props: RecentListProps<T>) {
+  const { kind, entries, birthdate } = props;
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [undo, setUndo] = useState<{ entry: DeletedEntry; newestAtDelete: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, startTransition] = useTransition();
 
-  // A new save from the forms above adds a higher id; that counts as "your
+  // A new save from the form above adds a higher id; that counts as "your
   // next action", so the Undo message is no longer offered.
-  const newestNow = [newestId(weighIns), newestId(calorieEntries)];
-  const undoStillValid = undo && newestNow.every((id, i) => id <= undo.newestAtDelete[i]);
+  const newestNow = entries[0]?.id ?? 0;
+  const undoStillValid = undo && newestNow <= undo.newestAtDelete;
 
-  function remove(kind: Kind, id: number) {
+  function remove(id: number) {
     setError(null);
-    setEditing(null);
+    setEditingId(null);
     const before = newestNow;
     startTransition(async () => {
       const result = await deleteEntry(kind, String(id));
@@ -77,19 +123,17 @@ export function RecentEntries({ weighIns, calorieEntries, unitSystem, birthdate 
     });
   }
 
-  function startEdit(kind: Kind, id: number) {
+  function startEdit(id: number) {
     setUndo(null); // editing is your next action
     setError(null);
-    setEditing({ kind, id });
+    setEditingId(id);
   }
-
-  const isEditing = (kind: Kind, id: number) => editing?.kind === kind && editing.id === id;
 
   return (
     <section className="flex flex-col gap-4">
       {undoStillValid && (
         <p role="status" className="flex flex-wrap items-center gap-2 rounded border border-line p-2 text-sm">
-          Deleted {describe(undo.entry, unitSystem)}.
+          Deleted {props.describeDeleted(undo.entry)} from {formatDate(undo.entry.date)}.
           <button type="button" onClick={restore} disabled={busy} className={`${smallButton} font-medium`}>
             Undo
           </button>
@@ -101,56 +145,26 @@ export function RecentEntries({ weighIns, calorieEntries, unitSystem, birthdate 
         </p>
       )}
 
-      <EntryList title="Recent weigh-ins" empty="No weigh-ins yet.">
-        {weighIns.map((w) =>
-          isEditing("weighIn", w.id) ? (
+      <EntryList title={props.title} empty={props.empty}>
+        {entries.map((entry) =>
+          editingId === entry.id ? (
             <EditRow
-              key={w.id}
-              action={editWeighIn}
-              id={w.id}
-              date={w.date}
+              key={entry.id}
+              action={props.editAction}
+              id={entry.id}
+              date={entry.date}
               birthdate={birthdate}
-              valueField={{
-                name: "weight",
-                label: `Weight (${unitSystem === "metric" ? "kg" : "lb"})`,
-                value: displayWeight(w.weightKg, unitSystem).value.toFixed(1),
-                step: "any",
-              }}
-              onDone={() => setEditing(null)}
+              valueField={props.editField(entry)}
+              onDone={() => setEditingId(null)}
             />
           ) : (
             <Row
-              key={w.id}
-              date={w.date}
-              value={showWeight(w.weightKg, unitSystem)}
+              key={entry.id}
+              date={entry.date}
+              value={props.show(entry)}
               busy={busy}
-              onEdit={() => startEdit("weighIn", w.id)}
-              onDelete={() => remove("weighIn", w.id)}
-            />
-          ),
-        )}
-      </EntryList>
-
-      <EntryList title="Recent calories" empty="No calorie entries yet.">
-        {calorieEntries.map((c) =>
-          isEditing("calories", c.id) ? (
-            <EditRow
-              key={c.id}
-              action={editCalorieEntry}
-              id={c.id}
-              date={c.date}
-              birthdate={birthdate}
-              valueField={{ name: "calories", label: "Calories", value: String(c.calories), step: "1" }}
-              onDone={() => setEditing(null)}
-            />
-          ) : (
-            <Row
-              key={c.id}
-              date={c.date}
-              value={`${c.calories.toLocaleString("en-US")} cal`}
-              busy={busy}
-              onEdit={() => startEdit("calories", c.id)}
-              onDelete={() => remove("calories", c.id)}
+              onEdit={() => startEdit(entry.id)}
+              onDelete={() => remove(entry.id)}
             />
           ),
         )}
@@ -192,7 +206,7 @@ interface EditRowProps {
   id: number;
   date: string;
   birthdate: string;
-  valueField: { name: string; label: string; value: string; step: string };
+  valueField: ValueField;
   onDone: () => void;
 }
 

@@ -65,8 +65,8 @@ export function Calculators({ stats, activityLevel, unitSystem, latest }: Props)
         {!latest && (
           <p className="text-sm text-muted">
             Log a weigh-in to use your latest weight.{" "}
-            <Link href="/" className="underline">
-              Go to Log
+            <Link href="/weigh-ins" className="underline">
+              Go to Weigh-ins
             </Link>
           </p>
         )}

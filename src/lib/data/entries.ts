@@ -52,20 +52,6 @@ export async function createMyCalorieEntry(input: CalorieInput): Promise<SaveRes
   return "saved";
 }
 
-/** Whether the signed-in user has logged any weigh-in (false if signed out). */
-export async function hasAnyWeighIn(): Promise<boolean> {
-  const user = await getVerifiedUser();
-  if (!user) return false;
-
-  const { data, error } = await createSupabaseAdminClient()
-    .from("weigh_ins")
-    .select("id")
-    .eq("owner_id", user.id) // the ownership check
-    .limit(1);
-  if (error) throw new Error(`Couldn't load weigh-ins (${error.code})`);
-  return data.length > 0;
-}
-
 /**
  * The signed-in user's latest weigh-in: newest date, and if several share
  * that date, the one saved last (highest id). Null if none or signed out.
