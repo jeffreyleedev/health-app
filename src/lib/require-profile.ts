@@ -1,6 +1,6 @@
 /**
  * The page-load profile check. Every protected page calls this (enforced by
- * src/lib/require-profile.test.ts). Exempt pages: the sign-in pages,
+ * src/lib/require-profile.guard.test.ts). Exempt pages: the sign-in pages,
  * /update-password, and /profile/setup itself.
  *
  *   signed out          → /sign-in

@@ -4,7 +4,7 @@
  * Theme colors. Each has a light and a dark value; the page follows the
  * device's setting. Components use these names (text-muted, border-line,
  * bg-foreground, text-danger, ...) — never fixed colors like bg-black.
- * src/lib/theme.test.ts enforces that.
+ * src/lib/theme.guard.test.ts enforces that.
  *
  * Contrast vs the page background (text needs ≥ 4.5:1, borders ≥ 3:1):
  *   light: foreground 17.9, muted 7.8, line 3.5, danger 6.5, success 5.0, warning 5.0, info 6.7

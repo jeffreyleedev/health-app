@@ -1,7 +1,11 @@
-# Runs the project's four checks (Prettier, ESLint, Tests, Build) on
-# pull requests. `npm run check` runs the same commands locally, one after
-# another. There's no separate typecheck: `next build` type-checks every
-# file in tsconfig, including tests and scripts.
+# Runs the project's five checks (Prettier, ESLint, Unit Tests, Guard
+# Tests, Build) on pull requests. `npm run check` runs the same commands
+# locally, one after another. There's no separate typecheck: `next build`
+# type-checks every file in tsconfig, including tests and scripts.
+#
+# Guard tests are files named *.guard.test.ts (project rules: profile check
+# on every page, theme colors, schema permissions); everything else is a
+# unit test.
 #
 # Pull requests only: each run tests the result of merging the PR into its
 # base branch (the latest main), which is what the main ruleset requires to
@@ -29,7 +33,7 @@ concurrency:
 jobs:
   # One job per check, all running at the same time on separate machines.
   # Each shows up on pull requests as its own check, and the ruleset on
-  # main requires all four by these names, so keep them in sync if renamed.
+  # main requires all five by these names, so keep them in sync if renamed.
   check:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -44,8 +48,10 @@ jobs:
             command: npm run format:check
           - name: ESLint
             command: npm run lint
-          - name: Tests
-            command: npm test
+          - name: Unit Tests
+            command: npm run test:unit
+          - name: Guard Tests
+            command: npm run test:guard
           - name: Build
             command: npm run build
     steps:

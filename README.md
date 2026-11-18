@@ -144,10 +144,10 @@ scripts/               check-supabase.mjs
 
 Besides unit tests for the logic, a few tests protect the rules above:
 
-- `require-profile.test.ts` fails if a page skips the profile check.
-- `theme.test.ts` fails if a component uses a fixed color instead of a theme
+- `require-profile.guard.test.ts` fails if a page skips the profile check.
+- `theme.guard.test.ts` fails if a component uses a fixed color instead of a theme
   color, which would break dark mode.
-- `schema.test.ts` fails if a migration adds an RLS policy or grants table
+- `schema.guard.test.ts` fails if a migration adds an RLS policy or grants table
   access to the browser's roles.
 - Importing the secret-key client into browser code fails the build
   (`server-only`).

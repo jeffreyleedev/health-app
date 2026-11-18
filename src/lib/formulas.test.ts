@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { ACTIVITY_LEVELS, BMI_CATEGORY_COLOR, BMI_CATEGORY_LABELS, bmi, bmiCategory, bmr, tdee } from "./formulas";
+import { ACTIVITY_LEVELS, bmi, bmiCategory, bmr, tdee } from "./formulas";
 
 describe("bmr (Mifflin-St Jeor)", () => {
   it("adds 5 for males", () => {
@@ -53,21 +51,5 @@ describe("bmiCategory", () => {
     expect(bmiCategory(24.96)).toBe("overweight"); // shown as 25.0
     expect(bmiCategory(24.94)).toBe("healthy"); // shown as 24.9
     expect(bmiCategory(18.46)).toBe("healthy"); // shown as 18.5
-  });
-});
-
-describe("BMI_CATEGORY_COLOR", () => {
-  it("gives every category a color that exists in the theme", () => {
-    const css = readFileSync(join(__dirname, "../app/globals.css"), "utf8");
-    expect(Object.keys(BMI_CATEGORY_COLOR).sort()).toEqual(Object.keys(BMI_CATEGORY_LABELS).sort());
-    for (const cls of Object.values(BMI_CATEGORY_COLOR)) {
-      const name = cls.replace(/^text-/, "");
-      expect(css).toContain(`--color-${name}: var(--${name});`); // registered with Tailwind
-      expect(css.match(new RegExp(`--${name}: #`, "g"))?.length).toBe(2); // light + dark values
-    }
-  });
-
-  it("uses a different color for each category", () => {
-    expect(new Set(Object.values(BMI_CATEGORY_COLOR)).size).toBe(4);
   });
 });
