@@ -4,8 +4,13 @@
  * History: the last 12 periods for the chosen cadence, grouped in the
  * browser so switching cadence is instant. Ends at the period containing
  * your local today (labeled "so far").
+ *
+ * Empty states: with no entries at all, a short explanation of what History
+ * will show is the only thing on the page; with entries but none in the
+ * selected window, a one-line note sits above the (empty) charts and table.
  */
 
+import Link from "next/link";
 import { useState } from "react";
 import { BMI_CATEGORY_COLOR, BMI_CATEGORY_LABELS, bmi, bmiCategory } from "@/lib/formulas";
 import {
@@ -20,10 +25,10 @@ import { displayWeight, roundTo, type UnitSystem } from "@/lib/units";
 import { LineChart } from "./line-chart";
 import { useLocalToday } from "./use-local-today";
 
-const CADENCES: { key: Cadence; label: string }[] = [
-  { key: "daily", label: "Daily" },
-  { key: "weekly", label: "Weekly" },
-  { key: "monthly", label: "Monthly" },
+const CADENCES: { key: Cadence; label: string; unit: string }[] = [
+  { key: "daily", label: "Daily", unit: "days" },
+  { key: "weekly", label: "Weekly", unit: "weeks" },
+  { key: "monthly", label: "Monthly", unit: "months" },
 ];
 
 interface Props {
@@ -35,7 +40,36 @@ interface Props {
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Props) {
+export function History(props: Props) {
+  // "Never logged" = nothing in the ~13 months the page loads. Needs no date,
+  // so it shows right away instead of "Loading…".
+  if (props.weighIns.length === 0 && props.calorieEntries.length === 0) return <NewUserMessage />;
+  return <HistoryView {...props} />;
+}
+
+/** The only thing on History until the first weigh-in or calorie entry. */
+function NewUserMessage() {
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-lg font-semibold">Your progress will show up here</h2>
+      <p>
+        As you log weigh-ins and calories, History charts your average weight and BMI and shows your average daily
+        calories. You can view them by day, week or month to see how they change over time.
+      </p>
+      <p>
+        <Link href="/weigh-ins" className="underline">
+          Log a weigh-in
+        </Link>{" "}
+        ·{" "}
+        <Link href="/calories" className="underline">
+          Log calories
+        </Link>
+      </p>
+    </section>
+  );
+}
+
+function HistoryView({ weighIns, calorieEntries, unitSystem, heightCm }: Props) {
   const [cadence, setCadence] = useState<Cadence>("daily");
   const today = useLocalToday(); // "" until the browser fills it in
 
@@ -82,7 +116,20 @@ export function History({ weighIns, calorieEntries, unitSystem, heightCm }: Prop
         <p>Loading…</p>
       ) : (
         <>
-          {!hasData && <p className="text-sm text-muted">No entries in the last {HISTORY_PERIODS} periods yet.</p>}
+          {!hasData && (
+            <p className="text-sm text-muted">
+              No entries in the last {HISTORY_PERIODS} {CADENCES.find((c) => c.key === cadence)?.unit}.{" "}
+              {cadence !== "monthly" && "Switch to Weekly or Monthly to see a longer stretch, or "}
+              <Link href="/weigh-ins" className="underline">
+                {cadence === "monthly" ? "Log a weigh-in" : "log a weigh-in"}
+              </Link>{" "}
+              or{" "}
+              <Link href="/calories" className="underline">
+                log calories
+              </Link>
+              .
+            </p>
+          )}
 
           <section className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold">Weight ({weightUnit})</h2>
