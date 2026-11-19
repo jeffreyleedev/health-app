@@ -37,7 +37,7 @@ their own account, and their data follows them between phone and laptop.
 - [Supabase](https://supabase.com) for the PostgreSQL database and
   authentication
 - Tailwind CSS 4
-- Vitest for tests
+- Vitest for unit tests, Playwright for end-to-end tests
 
 ## Getting started
 
@@ -98,6 +98,8 @@ Open [http://localhost:3000](http://localhost:3000) and create an account.
 | `npm run test:watch`     | Re-run tests on every change                                  |
 | `npm run lint`           | Lint                                                          |
 | `npm run check:supabase` | Check database access with your real keys (never prints them) |
+| `npm run test:e2e`       | Build the app and run the Playwright tests in Chromium        |
+| `npm run e2e:cleanup`    | Delete leftover e2e test accounts (`-- --dry-run` to count)   |
 
 ## How it's built
 
@@ -137,7 +139,8 @@ src/
   lib/supabase/   Supabase clients (the secret-key client is server-only)
   proxy.ts        session refresh and sign-in redirects
 supabase/migrations/   database schema, applied in order
-scripts/               check-supabase.mjs
+e2e/                   Playwright tests (*.e2e.ts), fixtures, test-account rules
+scripts/               check-supabase.mjs, e2e-cleanup.mjs
 ```
 
 ### Guard tests
@@ -151,6 +154,25 @@ Besides unit tests for the logic, a few tests protect the rules above:
   access to the browser's roles.
 - Importing the secret-key client into browser code fails the build
   (`server-only`).
+
+### End-to-end tests
+
+`npm run test:e2e` builds the app, starts it on port 3100, and drives it in
+Chromium: one happy path per page (sign-in/out, profile setup, Weigh-ins,
+Calories, BMI, History, Settings, delete account, and the signed-out
+redirect). Flows that send email (sign-up, password reset) aren't tested.
+
+- **Real database.** The tests use the same Supabase project as the app.
+  Each test creates its own confirmed account through the admin API (no
+  email is sent) and deletes it when the test ends.
+- **Test accounts** are `<name>+test<digits>@<domain>`, built from
+  `E2E_EMAIL_BASE` in `.env.local`. The daily **E2E cleanup** workflow
+  deletes only addresses of exactly that form that are over an hour old.
+- **CI** runs them as the **E2E Tests** check, with the keys and
+  `E2E_EMAIL_BASE` stored as GitHub Secrets.
+- Supabase allows about 30 sign-ins per 5 minutes per IP address and a run
+  uses 9, so running the suite more than ~3 times in 5 minutes locally fails
+  until the limit resets.
 
 ## Notes
 
