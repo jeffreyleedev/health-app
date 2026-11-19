@@ -1,0 +1,41 @@
+# Once a day, deletes e2e test accounts left behind when a test run crashed
+# or was cancelled before its after hooks ran (scripts/e2e-cleanup.mjs).
+# Only addresses of exactly the form <E2E_EMAIL_BASE name>+test<digits>@<domain>
+# that are over an hour old are deleted. The log shows counts, never addresses.
+#
+# Can also be started by hand: Actions → E2E cleanup → Run workflow.
+# GitHub turns off scheduled workflows after 60 days without repository
+# activity; re-enable it from the Actions tab if that happens.
+
+name: E2E cleanup
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: Delete leftover test accounts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      E2E_EMAIL_BASE: ${{ secrets.E2E_EMAIL_BASE }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete leftover test accounts
+        run: npm run e2e:cleanup
