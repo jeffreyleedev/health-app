@@ -1,7 +1,8 @@
-# Runs the project's five checks (Prettier, ESLint, Unit Tests, Guard
-# Tests, Build) on pull requests. `npm run check` runs the same commands
-# locally, one after another. There's no separate typecheck: `next build`
-# type-checks every file in tsconfig, including tests and scripts.
+# Runs the project's checks on pull requests: Prettier, ESLint, Unit Tests,
+# Guard Tests, Build, and E2E Tests. `npm run check` runs the first five
+# locally, one after another; `npm run test:e2e` runs the last. There's no
+# separate typecheck: `next build` type-checks every file in tsconfig,
+# including tests and scripts.
 #
 # Guard tests are files named *.guard.test.ts (project rules: profile check
 # on every page, theme colors, schema permissions); everything else is a
@@ -12,9 +13,11 @@
 # pass before merging. Pushing a branch without a PR runs nothing, so run
 # `npm run check` locally before pushing.
 #
-# No Supabase keys here on purpose: the secret key bypasses Row Level
-# Security, so it stays only in .env.local and Supabase. The live database
-# check (`npm run check:supabase`) is run by hand after migrations.
+# Supabase keys: only the E2E Tests job gets them (from GitHub Secrets), because
+# it runs the real app against the real database. The secret key bypasses Row
+# Level Security, so no other job sees it. GitHub doesn't give secrets to pull
+# requests from forks, so E2E Tests fails on those. The live database check
+# (`npm run check:supabase`) is still run by hand after migrations.
 
 name: CI
 
@@ -67,3 +70,34 @@ jobs:
 
       - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
+
+  # End-to-end tests: Playwright drives a production build of the app in
+  # Chromium. Each test creates its own +test account and deletes it after;
+  # .github/workflows/e2e-cleanup.yml removes any left behind by a crash.
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      E2E_EMAIL_BASE: ${{ secrets.E2E_EMAIL_BASE }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # No report or trace is uploaded: artifacts on a public repo can be
+      # downloaded by anyone, and traces contain the test account's address.
+      - name: E2E Tests
+        run: npm run test:e2e
